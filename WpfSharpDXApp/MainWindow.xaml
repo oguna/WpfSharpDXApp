@@ -5,8 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfSharpDXApp"
         mc:Ignorable="d"
+        xmlns:DXExtensions="clr-namespace:Microsoft.Wpf.Interop.DirectX;assembly=Microsoft.Wpf.Interop.DirectX"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
-        
+        <Image>
+            <Image.Source>
+                <DXExtensions:D3D11Image x:Name="InteropImage"/>
+            </Image.Source>
+        </Image>
     </Grid>
 </Window>
