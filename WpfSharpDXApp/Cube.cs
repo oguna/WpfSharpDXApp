@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -35,7 +36,7 @@ namespace WpfSharpDXApp
             public Matrix Projection;
         }
 
-        private Camera camera;
+        private Camera camera = new Camera();
         private IntPtr inst;
         private DriverType driverType;
         private FeatureLevel featureLevel;
@@ -70,7 +71,8 @@ namespace WpfSharpDXApp
             {
                 try
                 {
-                    device = new Device(null, createDeviceFlag, featureLevels);
+                    device = new Device(driverType, createDeviceFlag, featureLevels);
+                    immediateContext = device.ImmediateContext;
                 }
                 catch (Exception e)
                 {
@@ -138,7 +140,7 @@ namespace WpfSharpDXApp
             var cbd = new BufferDescription()
             {
                 Usage =  ResourceUsage.Default,
-                SizeInBytes = Utilities.SizeOf<ConstantBufferType>(),
+                SizeInBytes = Utilities.SizeOf<ConstantBuffer>(),
                 BindFlags = BindFlags.ConstantBuffer,
                 CpuAccessFlags = CpuAccessFlags.None
             };

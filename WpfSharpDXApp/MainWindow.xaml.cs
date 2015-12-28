@@ -48,7 +48,7 @@ namespace WpfSharpDXApp
         {
             InteropImage.WindowOwner = (new System.Windows.Interop.WindowInteropHelper(this)).Handle;
             InteropImage.OnRender = this.DoRender;
-            myApp = new MiniCube();
+            myApp = new Cube();
             myApp.InitDevice();
             InteropImage.SetPixelSize(800, 600);
             InteropImage.RequestRender();
