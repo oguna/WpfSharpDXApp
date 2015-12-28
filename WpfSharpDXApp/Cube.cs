@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -17,6 +18,7 @@ namespace WpfSharpDXApp
 {
     class Cube : IDisposable, ID3D11App
     {
+        [StructLayout(LayoutKind.Sequential)]
         struct SimpleVertex
         {
             public Vector3 Position;
@@ -29,6 +31,7 @@ namespace WpfSharpDXApp
             }
         }
 
+        [StructLayout(LayoutKind.Sequential)]
         struct ConstantBuffer
         {
             public Matrix World;
@@ -59,7 +62,6 @@ namespace WpfSharpDXApp
 
         public Cube()
         {
-            featureLevel = FeatureLevel.Level_11_0;
         }
 
         public void InitDevice()
@@ -67,12 +69,14 @@ namespace WpfSharpDXApp
             var createDeviceFlag = DeviceCreationFlags.BgraSupport;
             var driverTypes = new[] {DriverType.Hardware, DriverType.Warp, DriverType.Reference};
             var featureLevels = new[] {FeatureLevel.Level_11_0, FeatureLevel.Level_10_1, FeatureLevel.Level_10_0};
-            foreach (var driverType in driverTypes)
+            foreach (var dt in driverTypes)
             {
                 try
                 {
-                    device = new Device(driverType, createDeviceFlag, featureLevels);
-                    immediateContext = device.ImmediateContext;
+                    device = new Device(dt, createDeviceFlag, featureLevels);
+                    this.driverType = dt;
+                    this.featureLevel = device.FeatureLevel;
+                    this.immediateContext = device.ImmediateContext;
                 }
                 catch (Exception e)
                 {
@@ -129,6 +133,14 @@ namespace WpfSharpDXApp
                 6, 4, 5,
                 7, 4, 6,
             };
+            var ibd = new BufferDescription()
+            {
+                Usage = ResourceUsage.Default,
+                SizeInBytes = Utilities.SizeOf<ushort>() * 36,
+                BindFlags = BindFlags.None,
+                CpuAccessFlags = CpuAccessFlags.None
+            };
+            indexBuffer = Buffer.Create(device, indices, ibd);
 
             // Set index buffer
             immediateContext.InputAssembler.SetIndexBuffer(indexBuffer, Format.R16_UInt, 0);
@@ -155,8 +167,7 @@ namespace WpfSharpDXApp
             view = Matrix.LookAtLH(eye, at, up);
         }
 
-        private static float t = 0f;
-        private static long timeStart = 0;
+        private Stopwatch stopwatch;
 
         /// <summary>
         /// Renders a frame
@@ -172,19 +183,12 @@ namespace WpfSharpDXApp
             }
 
             // Update our time
-            if (driverType == DriverType.Reference)
+            if (stopwatch == null)
             {
-                t += (float) Math.PI*0.0125f;
+                stopwatch = new Stopwatch();
+                stopwatch.Start();
             }
-            else
-            {
-                var timeCur = DateTime.Now.Ticks;
-                if (timeStart == 0)
-                {
-                    timeStart = timeCur;
-                }
-                t = (timeCur - timeStart)/1000.0f;
-            }
+            var t = (float)stopwatch.Elapsed.TotalSeconds;
 
             // Animate the cube
             world = Matrix.RotationX(t)*Matrix.RotationY(t);

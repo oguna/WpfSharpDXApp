@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WpfSharpDXApp
 {
-    interface ID3D11App
+    interface ID3D11App : IDisposable
     {
         void InitDevice();
 
