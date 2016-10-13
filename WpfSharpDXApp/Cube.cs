@@ -137,7 +137,7 @@ namespace WpfSharpDXApp
             {
                 Usage = ResourceUsage.Default,
                 SizeInBytes = Utilities.SizeOf<ushort>() * 36,
-                BindFlags = BindFlags.None,
+                BindFlags = BindFlags.IndexBuffer,
                 CpuAccessFlags = CpuAccessFlags.None
             };
             indexBuffer = Buffer.Create(device, indices, ibd);
